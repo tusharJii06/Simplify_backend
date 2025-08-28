@@ -26,10 +26,16 @@ client = Groq(api_key=GROQ_API_KEY)
 # Create FastAPI instance
 app = FastAPI()
 
-# CORS
+# ✅ Allowed origins (only your frontend + local dev)
+origins = [
+    "http://localhost:5173",  # local dev with Vite
+    "https://simplify-bot.vercel.app"  # deployed frontend
+]
+
+# CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -63,12 +69,16 @@ async def chat(request: ChatRequest):
         try:
             parsed = json.loads(ai_response)
         except json.JSONDecodeError:
-            # Fallback: check if it's a plain string response
             parsed = {"answer": ai_response, "action": None, "slots": {}, "follow_up": None}
 
         # Force redirect if confirmed purchase
         answer_text = parsed.get("answer", "").lower()
-        if parsed.get("action") == "CALL_PURCHASE_API" or "purchase of" in answer_text or "transaction" in answer_text or "confirmed" in answer_text:
+        if (
+            parsed.get("action") == "CALL_PURCHASE_API"
+            or "purchase of" in answer_text
+            or "transaction" in answer_text
+            or "confirmed" in answer_text
+        ):
             parsed["redirect_url"] = SIMPLIFY_URL
 
         # Build response for frontend
@@ -77,8 +87,6 @@ async def chat(request: ChatRequest):
             resp["redirect_url"] = parsed["redirect_url"]
 
         return resp
-
-
 
     except Exception as e:
         return {"answer": f"⚠️ Error occurred: {str(e)}"}
