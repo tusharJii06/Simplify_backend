@@ -78,6 +78,12 @@ async def chat(request: ChatRequest):
             or "purchase of" in answer_text
             or "transaction" in answer_text
             or "confirmed" in answer_text
+            or "ready to buy" in answer_text
+            or "buy now" in answer_text
+            or "make the purchase" in answer_text
+            or "complete the purchase" in answer_text
+            or "proceed to buy" in answer_text
+            or "go ahead with the purchase" in answer_text
         ):
             parsed["redirect_url"] = SIMPLIFY_URL
 
