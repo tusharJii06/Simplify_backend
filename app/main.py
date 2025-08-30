@@ -76,6 +76,7 @@ async def chat(request: ChatRequest):
         if (
             parsed.get("action") == "CALL_PURCHASE_API"
             or "purchase of" in answer_text
+            or "Yes, confirm" in answer_text
             or "transaction" in answer_text
             or "confirmed" in answer_text
             or "ready to buy" in answer_text
